@@ -23,7 +23,24 @@ export const filterReducer = (state = {}, action) => {
         ...state,
         gender: action.payload.text,
       };
-    // case types.SET_SEARCH
+    case types.SET_SEARCH:
+      return {
+        ...state,
+        apiQuerys: {
+          ...state.apiQuerys,
+          search: action.payload.text,
+          pageNumber: 1,
+        },
+      };
+    case types.SET_PAGE:
+      return {
+        ...state,
+        apiQuerys: {
+          ...state.apiQuerys,
+          pageNumber: state.apiQuerys.pageNumber + 1,
+        },
+      };
+
     default:
       return state;
   }

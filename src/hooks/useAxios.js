@@ -1,14 +1,14 @@
-import { useContext, useEffect, useState } from 'react';
-import { mainContext } from '../context/Context';
+import { useContext, useEffect, useMemo, useState } from 'react';
+
 import axios from 'axios';
+import { mainContext } from '../context/Context';
 
-export const useAxios = queryParams => {
-  const { pageNumber, gender, search, status, species } = queryParams;
-
+export const useAxios = () => {
+  const { state, setDataOnContext, dataOnContext } = useContext(mainContext);
+  const { pageNumber, gender, search, status, species } = state.apiQuerys;
   const [loading, setLoading] = useState(false);
-  const [data, setdata] = useState([]);
   const [error, setError] = useState('');
-
+  const [hasMore, setHasMore] = useState(true);
   const fetchCharacters = async () => {
     try {
       setLoading(true);
@@ -16,22 +16,24 @@ export const useAxios = queryParams => {
         `https://rickandmortyapi.com/api/character/?page=${pageNumber}&name=${search}&status=${status}&gender=${gender}&species=${species}`
       );
 
-      setdata(data);
+      data.info.next === null && setHasMore(false);
+      setDataOnContext(dataOnContext.concat(data.results));
+
       setLoading(false);
     } catch (error) {
-      console.log(error);
-      setError(error.message);
+      setError(error.code);
       setLoading(false);
     }
+    setLoading(true);
   };
 
   useEffect(() => {
     fetchCharacters();
-  }, [queryParams]);
+  }, [state.apiQuerys]);
 
   return {
-    data,
     loading,
     error,
+    hasMore,
   };
 };
