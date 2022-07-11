@@ -1,5 +1,3 @@
-import { useContext } from 'react';
-import { mainContext } from '../context/Context';
 import { types } from '../reducer/types';
 
 export const setFilterAction = (filter, type) => {

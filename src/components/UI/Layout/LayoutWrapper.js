@@ -8,4 +8,5 @@ export const LayoutWrapper = styled.div`
   align-items: center;
   justify-content: center;
   background-color: #070707;
+  gap: 1rem;
 `;

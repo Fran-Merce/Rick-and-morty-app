@@ -1,50 +1,50 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import { useAxios } from '../hooks/useAxios';
 import { mainContext } from '../context/Context';
-import { setPageAction, setSearchAction } from '../actions/actions';
+import { setPageAction } from '../actions/actions';
 import { types } from '../reducer/types';
 import { CharacterCard } from '../components/CharacterCard/CharacterCard';
 import { CharactersCardsWrapper } from '../components/UI/CharactersCardsWrapper';
-
 import { filtersCharactersTypes } from '../helpers/dataFilters';
 import { FilterCharacters } from '../components/FilterCharacters/FilterCharacters';
+import Loader from '../components/UI/Loader/Loader';
+import Error from '../components/UI/Error/Error';
+import { Search } from '../components/Search/Search';
+import heroLogo from './img.png';
+import { ButtonStyled } from '../components/UI/button/ButtonStyled';
+import { HeroImg } from '../components/UI/HeroImg/HeroImg';
 
 export const HomePage = () => {
-  const [search, setSearch] = useState('');
   const { loading, error, hasMore } = useAxios();
-  const { dispatch, dataOnContext, setDataOnContext, state } =
-    useContext(mainContext);
-
-  const handleOnChange = e => {
-    setSearch(e.target.value);
-  };
-
-  const onSubmit = e => {
-    e.preventDefault();
-    setDataOnContext([]);
-    dispatch(setSearchAction(search));
-  };
+  const { dispatch, dataOnContext } = useContext(mainContext);
+  if (error && !loading)
+    return (
+      <>
+        <HeroImg src={heroLogo} alt='' />
+        <Search loading={loading} />
+        <Error error={error.code} />
+      </>
+    );
 
   return (
     <>
-      <form onSubmit={onSubmit}>
-        <input type='text' onChange={handleOnChange} value={search} />
-      </form>
-
-      {filtersCharactersTypes.map(type => (
-        <FilterCharacters typeFilter={type} />
-      ))}
-
+      <HeroImg src={heroLogo} alt='' />
+      <Search loading={loading} />
       <CharactersCardsWrapper>
         {dataOnContext?.map(character => (
-          <CharacterCard {...character} />
+          <CharacterCard key={character.id} {...character} />
         ))}
+        {loading && <Loader error={error.error} />}
       </CharactersCardsWrapper>
-      {hasMore && (
-        <button onClick={e => dispatch(setPageAction(types.SET_PAGE_NUMBER))}>
+
+      {hasMore && !error && !loading ? (
+        <ButtonStyled
+          disabled={loading}
+          onClick={e => dispatch(setPageAction(types.SET_PAGE_NUMBER))}
+        >
           Ver Mas
-        </button>
-      )}
+        </ButtonStyled>
+      ) : null}
     </>
   );
 };
